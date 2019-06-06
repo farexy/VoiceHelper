@@ -12,6 +12,11 @@
     <audio id=recordedAudio></audio>  
 </p>
 
+<form action="/upload" method="post" enctype="multipart/form-data">
+    <input type="file" name="fileToUpload" id="fileToUpload">
+    <input type="submit" value="Upload File" name="submit">
+</form>
+
 @foreach (var product in Model.Products)
 {
     <div>
@@ -33,6 +38,5 @@
 
     </div>
 }
-
 
 <script src="https://cdn.rawgit.com/mattdiamond/Recorderjs/08e7abd9/dist/recorder.js"></script>

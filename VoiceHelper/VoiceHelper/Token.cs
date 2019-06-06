@@ -8,6 +8,6 @@ namespace VoiceHelper.VoiceHelper
 
     public enum TokenType
     {
-        Text, FindRequest, SortBy, Category
+        Text, FindRequest, SortBy, SortByNext, SortDesc, Category
     }
 }

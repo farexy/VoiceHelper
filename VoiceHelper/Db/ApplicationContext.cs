@@ -1,4 +1,3 @@
-using System;
 using Microsoft.EntityFrameworkCore;
 
 namespace VoiceHelper.Db
@@ -7,7 +6,7 @@ namespace VoiceHelper.Db
     {
         public DbSet<Product> Products { get; set; }
          
-        public ApplicationContext(DbContextOptions opt) : base(opt)
+        public ApplicationContext() : base()
         {
 //            try
 //            {
@@ -18,6 +17,11 @@ namespace VoiceHelper.Db
 //            {
 //                // ignored
 //            }
+        }
+        
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseNpgsql(@"Server=localhost;Port=5432;Database=voice-helper;Uid=postgres;Pwd=123456;");
         }
     }
 }

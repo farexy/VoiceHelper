@@ -39,13 +39,10 @@ namespace VoiceHelper.Controllers
         }
 
         [HttpPost("upload")]
-        public async Task Upload()
+        public async Task<IActionResult> Upload()
         {
             var file = Request.Form.Files.First();
-            var fileName = ContentDispositionHeaderValue
-                .Parse(file.ContentDisposition)
-                .FileName
-                + ".mp3";
+            var fileName = "file.m4a";
 
             var filePath = _hostingEnvironment.WebRootPath + '\\' + fileName;
             using (var fileStream = new FileStream(filePath, FileMode.Create))
@@ -54,6 +51,9 @@ namespace VoiceHelper.Controllers
             }
 
             var res = await _speechToTextConverter.ConvertAsync(filePath);
+            var tokens = new SpeechParser().Parse(res.Substring(0, res.Length - 1));
+            var records = await new QueryBuilder(_context.Products).BuildQuery(tokens).ToListAsync();
+            return View("Index", new ProductsViewModel{Products = records});
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

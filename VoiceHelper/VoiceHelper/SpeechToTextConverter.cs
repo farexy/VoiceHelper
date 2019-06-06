@@ -19,20 +19,20 @@ namespace VoiceHelper.VoiceHelper
 
         public async Task<string> ConvertAsync(string fileName)
         {
-            var outputFile = fileName.Replace("blob.mp3", "out.wav");
-            using(var reader = new Mp3FileReader(fileName))
-            {
-                WaveFileWriter.CreateWaveFile(outputFile, reader);
-            }
-//            using(var inputStream = File.OpenRead(fileName))
-//            using (var reader = new WaveFileReader(inputStream))
+            var outputFile = fileName.Replace("file.m4a", "out.wav");
+//            using(var reader = new Mp3FileReader(fileName))
 //            {
-//                var newFormat = new WaveFormat(16000, 16, 1); 
-//                using (var conversionStream = new WaveFormatConversionStream(newFormat, reader))
-//                {
-//                    WaveFileWriter.CreateWaveFile(outputFile, conversionStream);
-//                } 
+//                WaveFileWriter.CreateWaveFile(outputFile, reader);
 //            }
+//            using(var inputStream = File.OpenRead(fileName))
+            using (var reader = new MediaFoundationReader(fileName))
+            {
+                var newFormat = new WaveFormat(16000, 16, 1); 
+                using (var conversionStream = new WaveFormatConversionStream(newFormat, reader))
+                {
+                    WaveFileWriter.CreateWaveFile(outputFile, conversionStream);
+                } 
+            }
             
             using (var inputSpeech = AudioConfig.FromWavFileInput(outputFile))
             using (var recognizer = new SpeechRecognizer(
@@ -70,7 +70,6 @@ namespace VoiceHelper.VoiceHelper
                 };
                 recognizer.SessionStopped += (s, e) =>
                 {
-                    result = "Session stopped event";
                     stopRecognition.TrySetResult(0);
                 };
                 await recognizer.RecognizeOnceAsync();
