@@ -20,11 +20,6 @@ namespace VoiceHelper.VoiceHelper
         public async Task<string> ConvertAsync(string fileName)
         {
             var outputFile = fileName.Replace("file.m4a", "out.wav");
-//            using(var reader = new Mp3FileReader(fileName))
-//            {
-//                WaveFileWriter.CreateWaveFile(outputFile, reader);
-//            }
-//            using(var inputStream = File.OpenRead(fileName))
             using (var reader = new MediaFoundationReader(fileName))
             {
                 var newFormat = new WaveFormat(16000, 16, 1); 

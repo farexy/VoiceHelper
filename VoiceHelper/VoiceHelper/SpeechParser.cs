@@ -14,30 +14,29 @@ namespace VoiceHelper.VoiceHelper
             ["show"] = TokenType.FindRequest,
             ["order"] = TokenType.SortBy,
             ["sort"] = TokenType.SortBy,
-            ["category"] = TokenType.Category,
-            ["only"] = TokenType.Category,
-            ["all"] = TokenType.Category,
+            ["then"] = TokenType.SortByNext,
             ["descending"] = TokenType.SortDesc
         };
+        
         public List<Token> Parse(string speech)
         {
             var tokens = new List<Token>();
-            var words = speech.Split(' ');
+            var words = speech.Replace(",","").Replace(".","").Split(' ');
 
-            for (int i = 0; i < words.Length; i++)
+            foreach (var word in words)
             {
-                if (HelpWords.Contains(words[i]) && tokens.LastOrDefault()?.Type != TokenType.Text)
+                if (HelpWords.Contains(word) && tokens.LastOrDefault()?.Type != TokenType.Text)
                 {
                     continue;
                 }
                 var tokenType = TokenTypesByWords
-                    .FirstOrDefault(t => StringsAreClose(t.Key, words[i]))
+                    .FirstOrDefault(t => StringsAreClose(t.Key, word))
                     .Value;
                 
                 tokens.Add(new Token
                 {
                     Type = tokenType,
-                    Value = words[i]
+                    Value = word
                 });
             }
             

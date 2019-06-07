@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using VoiceHelper.Db;
 
 namespace VoiceHelper.VoiceHelper
@@ -18,6 +19,8 @@ namespace VoiceHelper.VoiceHelper
         private int? _nameOrder;
         private int? _categoryOrder;
         private int? _priceOrder;
+
+        private bool _ordered;
         
         public QueryBuilder(IQueryable<Product> dbCollection)
         {
@@ -77,6 +80,25 @@ namespace VoiceHelper.VoiceHelper
                     query = query.Where(p => p.Name.Equals(text, StringComparison.InvariantCultureIgnoreCase) 
                                              || p.Category.Equals(text, StringComparison.InvariantCultureIgnoreCase));
                 }
+
+                if (i != tokens.Count - 1)
+                {
+                    if (tokens[i].Type == TokenType.SortBy || tokens[i].Type == TokenType.SortByNext)
+                    {
+                        var text = "";
+                        Token token = null;
+                        while (i < tokens.Count - 1 && tokens[i + 1].Type is TokenType.Text)
+                        {
+                            token = tokens[++i];
+                            text += token.Value;
+                        }
+
+                        query = ResolveOrderByText(text, query, token?.Type is TokenType.SortDesc);
+
+                    }
+                    
+                }
+                
             }
 
             return query;
@@ -102,9 +124,53 @@ namespace VoiceHelper.VoiceHelper
 //            }
         }
         
-        private static void ResolveOrderByTokens(Token token)
+        
+        
+        private IQueryable<Product> ResolveOrderByText(string orderingText, IQueryable<Product> query, bool desc)
         {
-            
+            if (orderingText.Equals("price", StringComparison.InvariantCultureIgnoreCase))
+            {
+                if (_ordered)
+                {
+                    query = desc 
+                        ? (query as IOrderedQueryable<Product>).ThenByDescending(p => p.Price)
+                        : (query as IOrderedQueryable<Product>).ThenBy(p => p.Price);
+                }
+                else
+                {
+                    query = desc ? query.OrderByDescending(p => p.Price) : query.OrderBy(p => p.Price);
+                }
+                
+            }
+            if (orderingText.Equals("category", StringComparison.InvariantCultureIgnoreCase))
+            {
+                if (_ordered)
+                {
+                    query = desc 
+                        ? (query as IOrderedQueryable<Product>).ThenByDescending(p => p.Category)
+                        : (query as IOrderedQueryable<Product>).ThenBy(p => p.Category);
+                }
+                else
+                {
+                    query = desc ? query.OrderByDescending(p => p.Category) : query.OrderBy(p => p.Category);
+                }
+            }
+            if (orderingText.Equals("name", StringComparison.InvariantCultureIgnoreCase))
+            {
+                if (_ordered)
+                {
+                    query = desc 
+                        ? (query as IOrderedQueryable<Product>).ThenByDescending(p => p.Name)
+                        : (query as IOrderedQueryable<Product>).ThenBy(p => p.Name);
+                }
+                else
+                {
+                    query = desc ? query.OrderByDescending(p => p.Name) : query.OrderBy(p => p.Name);
+                }
+            }
+
+            _ordered = true;
+            return query;
         }
     }
 }

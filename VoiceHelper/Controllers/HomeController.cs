@@ -51,9 +51,9 @@ namespace VoiceHelper.Controllers
             }
 
             var res = await _speechToTextConverter.ConvertAsync(filePath);
-            var tokens = new SpeechParser().Parse(res.Substring(0, res.Length - 1));
+            var tokens = new SpeechParser().Parse(res);
             var records = await new QueryBuilder(_context.Products).BuildQuery(tokens).ToListAsync();
-            return View("Index", new ProductsViewModel{Products = records});
+            return View("Index", new ProductsViewModel{Recognized = res, Products = records});
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

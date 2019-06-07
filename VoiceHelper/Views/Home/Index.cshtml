@@ -17,6 +17,13 @@
     <input type="submit" value="Upload File" name="submit">
 </form>
 
+
+@if (Model.Recognized != null)
+{
+    <p>Query: @Model.Recognized</p>
+    <a href="/">Clear filters</a>
+}
+
 @foreach (var product in Model.Products)
 {
     <div>
@@ -27,6 +34,8 @@
         {
             <span>@product.Description</span>
         }
+        
+        <h4>@product.Price $</h4>
 
         @* Displays the product's image *@
         @if (!string.IsNullOrEmpty(product.ImageUrl))
